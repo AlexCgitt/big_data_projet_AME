@@ -120,35 +120,36 @@ for (colonne in names(data)) {
 #Mise en minuscule de la colonne stade de développement
 data$fk_stadedev <- tolower(data$fk_stadedev)
 
-# Vérification des doublons basés sur les coordonnées X et Y
-marquer_doublons <- function(data, verif) {
-  is_duplicated <- rep(FALSE, nrow(data))
-  for (i in 1:(nrow(data)-1)) { # -1 pour éviter de comparer le dernier élément avec un élément inexistant # nolint
-    for (j in (i + 1):nrow(data)) {
-      if (!is.na(data$X[i]) && !is.na(data$X[j]) &&
-          !is.na(data$Y[i]) && !is.na(data$Y[j]) &&
-          data$X[i] == data$X[j] && data$Y[i] == data$Y[j] &&
-          !is.na(data$fk_arb_etat[i]) && !is.na(data$fk_arb_etat[j]) &&
-          data$fk_arb_etat[i] %in% verif &&
-          data$fk_arb_etat[j] %in% verif) {
-        is_duplicated[j] <- TRUE
-      }
-    }
-  }
-  return(is_duplicated)
-}
-verif <- c("en place", "non essouché", "abattu")
-is_duplicated <- marquer_doublons(data, verif)
-duplicated_rows <- data[is_duplicated, ]
-print("------------Vérification de si on a des doublons-----------")#nolint
-print(nrow(duplicated_rows))
-print("------------------------------bilan: 1 doublons------------------------------------")#nolint
-data <- data[!is_duplicated, ]
-is_duplicated <- marquer_doublons(data, verif)
-duplicated_rows <- data[is_duplicated, ]
-print("------------Vérification de si on a des doublons après suppression-----------")#nolint
-print(nrow(duplicated_rows))
-print("------------------------------bilan: 0 doublons------------------------------------")#nolint
+# A décommenter pour vérifier si on a des doublons fonction qui prend enormement de temps 5 minutes
+# #Vérification des doublons basés sur les coordonnées X et Y
+# marquer_doublons <- function(data, verif) { #nolint
+#   is_duplicated <- rep(FALSE, nrow(data))
+#   for (i in 1:(nrow(data)-1)) { # -1 pour éviter de comparer le dernier élément avec un élément inexistant # nolint
+#     for (j in (i + 1):nrow(data)) {
+#       if (!is.na(data$X[i]) && !is.na(data$X[j]) &&
+#           !is.na(data$Y[i]) && !is.na(data$Y[j]) && # nolint
+#           data$X[i] == data$X[j] && data$Y[i] == data$Y[j] &&
+#           !is.na(data$fk_arb_etat[i]) && !is.na(data$fk_arb_etat[j]) &&
+#           data$fk_arb_etat[i] %in% verif &&
+#           data$fk_arb_etat[j] %in% verif) {
+#         is_duplicated[j] <- TRUE
+#       }
+#     }
+#   }
+#   return(is_duplicated)
+# }
+# verif <- c("en place", "non essouché", "abattu")
+# is_duplicated <- marquer_doublons(data, verif)
+# duplicated_rows <- data[is_duplicated, ]
+# print("------------Vérification de si on a des doublons-----------")#nolint
+# print(nrow(duplicated_rows))
+# print("------------------------------bilan: 1 doublons------------------------------------")#nolint
+# data <- data[!is_duplicated, ]
+# is_duplicated <- marquer_doublons(data, verif)
+# duplicated_rows <- data[is_duplicated, ]
+# print("------------Vérification de si on a des doublons après suppression-----------")#nolint
+# print(nrow(duplicated_rows))
+# print("------------------------------bilan: 0 doublons------------------------------------")#nolint
 
 
 
@@ -194,24 +195,7 @@ print("------------------------------bilan : 0 valeur NA------------------------
 
 
 
-#nettoyage colonne created_user
-
-print("------------Vérification de si on a des NA dans created_user-----------")
-print(table(is.na(data$created_user)))
-print(table(data$created_user))
-print("------------------------------bilan : 154 valeurs NA------------------------------------")# nolint
-
-data$created_user <- gsub(" ", ".", data$created_user) # gsub remplace les espaces par des points #nolint
-
-for (i in seq_len(nrow(data))) { # parcours de la colonne created_user # nolint
-    if (is.na(data$created_user[i])) { # si la valeur est NA # nolint
-        data$created_user[i] <- "unknown" # on remplace par unknown # nolint
-    } #nolint
-}
-print("------------Vérification de si on a des NA dans created_user après modification-----------") # nolint
-print(table(is.na(data$created_user)))
-print(table(data$created_user))
-print("------------------------------bilan : 0 valeurs NA------------------------------------")# nolint
+#pour ce qui  est des autres dates il est expliqué dans le rapport pourquoi on ne les retrouves pas ici #nolint
 
 
 
@@ -222,7 +206,7 @@ print(table(is.na(data$feuillage)))
 print(table(data$feuillage))
 print("------------------------------bilan : 170 valeurs NA------------------------------------")# nolint
 
-data$feuillage[is.na(data$feuillage)] <- "Inconnu" # remplace les valeurs NA par "Inconnu" # nolint
+data$feuillage[is.na(data$feuillage)] <- "inconnu" # remplace les valeurs NA par "Inconnu" # nolint
 
 print("------------Vérification de si on a des NA dans feuillage après modification-----------") # nolint
 print(table(is.na(data$feuillage)))
@@ -281,6 +265,27 @@ for (i in seq_len(nrow(data))) {
 
 print("------------Vérification de si on a des NA dans nomfrancais après modification-----------") # nolint
 print(table(is.na(data$nomfrancais)))
+print("------------------------------bilan : 0 valeurs NA------------------------------------")# nolint
+
+
+
+#nettoyage colonne created_user
+
+print("------------Vérification de si on a des NA dans created_user-----------")
+print(table(is.na(data$created_user)))
+print(table(data$created_user))
+print("------------------------------bilan : 154 valeurs NA------------------------------------")# nolint
+
+data$created_user <- gsub(" ", ".", data$created_user) # gsub remplace les espaces par des points #nolint
+
+for (i in seq_len(nrow(data))) { # parcours de la colonne created_user # nolint
+    if (is.na(data$created_user[i])) { # si la valeur est NA # nolint
+        data$created_user[i] <- "unknown" # on remplace par unknown # nolint
+    } #nolint
+}
+print("------------Vérification de si on a des NA dans created_user après modification-----------") # nolint
+print(table(is.na(data$created_user)))
+print(table(data$created_user))
 print("------------------------------bilan : 0 valeurs NA------------------------------------")# nolint
 
 
@@ -359,19 +364,74 @@ print(table(is.na(data$src_geo)))
 print(table(data$src_geo))
 print("------------------------------bilan : 0 valeurs NA------------------------------------")# nolint
 
+
+
+#nettoyage clc_nbr_diag
+
+print("------------Vérification de si on a des NA dans clc_nbr_diag-----------") # nolint
+print(table(is.na(data$clc_nbr_diag)))
+print("------------------------------bilan : 2526 valeurs NA------------------------------------")# nolint
+
+data$clc_nbr_diag[is.na(data$clc_nbr_diag)] <- 0
+
+print("------------Vérification de si on a des NA dans clc_nbr_diag après modification-----------") # nolint
+print(table(is.na(data$clc_nbr_diag)))
+print("------------------------------bilan : 0 valeurs NA------------------------------------")# nolint
+
+
+
+#nettoyage colonne villeca
+
+print("------------Vérification de si on a des NA dans villeca-----------") # nolint
+print(table(is.na(data$villeca)))
+print(table(data$villeca))
+print("------------------------------bilan : 25 valeurs NA------------------------------------")# nolint
+
+distance_geo <- function(x1, y1, x2, y2) {
+    return(sqrt((x1 - x2)^2 + (y1 - y2)^2)) # nolint
+}
+
+oui_villeca <- function(data) {
+  for (i in 1:nrow(data)) {
+      if (is.na(data$villeca[i])) {# nolint
+          min_dist <- Inf# nolint
+          closest_ville <- NA
+          for (j in 1:nrow(data)) {
+              if (!is.na(data$villeca[j]) && i != j) {# nolint
+                  dist <- distance_geo(data$X[i], data$Y[i], data$X[j], data$Y[j])# nolint
+                  if (dist < min_dist) {
+                      min_dist <- dist# nolint
+                      closest_ville <- data$villeca[j]
+                  }# nolint
+              }# nolint
+          }# nolint
+          data$villeca[i] <- closest_ville
+      }# nolint
+  }
+  return(data)
+}
+
+data <- oui_villeca(data) # nolint
+
+print("------------Vérification de si on a des NA dans villeca après modification-----------") # nolint
+print(table(is.na(data$villeca)))
+print(table(data$villeca))
+print("------------------------------bilan : 0 valeurs NA------------------------------------")# nolint
+
+
 #netttoyage colonne clc_quartier
 
 print("------------Vérification de si on a des NA dans clc_quartier-----------") # nolint
 print(table(is.na(data$clc_quartier)))
 print(table(data$clc_quartier))
-print("------------------------------bilan : 0 valeurs NA------------------------------------")# nolint
+print("------------------------------bilan : 97 valeurs NA------------------------------------")# nolint
 
 distance_geo <- function(x1, y1, x2, y2) {
     return(sqrt((x1 - x2)^2 + (y1 - y2)^2)) # nolint
 }
 
 
-impute_clc_quartier <- function(data) { # Imputation des valeurs manquantes dans clc_quartier en utilisant la distance géographique # nolint
+oui_clc_quartier <- function(data) { # Imputation des valeurs manquantes dans clc_quartier en utilisant la distance géographique # nolint
     for (i in 1:nrow(data)) { # nolint
         if (is.na(data$clc_quartier[i])) { # nolint
             min_dist <- Inf # nolint
@@ -396,7 +456,7 @@ impute_clc_quartier <- function(data) { # Imputation des valeurs manquantes dans
 }
 
 
-data <- impute_clc_quartier(data) # Appliquer la fonction d'imputation
+data <- oui_clc_quartier(data) # Appliquer la fonction d'imputation
 
 print("------------Vérification de si on a des NA dans clc_quartier après modification-----------") # nolint
 print(table(is.na(data$clc_quartier)))
@@ -417,7 +477,7 @@ print("------------------------------bilan : 0 valeurs NA-----------------------
 
 print("------------Vérification de si on a des NA dans id_arbre-----------") # nolint
 print(table(is.na(data$id_arbre)))
-print("------------------------------bilan : ... valeurs NA------------------------------------")# nolint
+print("------------------------------bilan : 0 valeurs NA------------------------------------")# nolint
 
 for (x in 2:length(data$id_arbre)) {
     if (is.na(data$id_arbre[x])) { # nolint
@@ -473,15 +533,15 @@ print(sum(is.na(data$tronc_diam)))
 print(sum(is.na(data$haut_tot)))
 
 
-data_temp = data[!is.na(data$haut_tot) & !is.na(data$haut_tronc) & !is.na(data$fk_stadedev) & !is.na(data$tronc_diam) & data$feuillage != "inconnu" & !is.na(data$age_estim),]
-model2 <- lm(tronc_diam ~ haut_tot + haut_tronc + fk_stadedev + feuillage + age_estim, data = data_temp)
-data$tronc_diam[is.na(data$tronc_diam)] <- predict(model2, newdata = data[is.na(data$tronc_diam),])
+data_temp = data[!is.na(data$haut_tot) & !is.na(data$haut_tronc) & !is.na(data$fk_stadedev) & !is.na(data$tronc_diam) & data$feuillage != "inconnu" & !is.na(data$age_estim),] # nolint
+model2 <- lm(tronc_diam ~ haut_tot + haut_tronc + fk_stadedev + feuillage + age_estim, data = data_temp) # nolint
+data$tronc_diam[is.na(data$tronc_diam)] <- predict(model2, newdata = data[is.na(data$tronc_diam),]) # nolint
 
 
-data_temp = data[!is.na(data$haut_tot) & !is.na(data$haut_tronc) & !is.na(data$fk_stadedev) & !is.na(data$tronc_diam),]
-model3 <- lm(haut_tronc ~ haut_tot + tronc_diam + fk_stadedev , data = data_temp)
+data_temp = data[!is.na(data$haut_tot) & !is.na(data$haut_tronc) & !is.na(data$fk_stadedev) & !is.na(data$tronc_diam),] # nolint
+model3 <- lm(haut_tronc ~ haut_tot + tronc_diam + fk_stadedev , data = data_temp) # nolint
 #met à jour les données NA de data$tronc_diam à partir de model3
-data$haut_tronc[is.na(data$haut_tronc)] <- predict(model3, newdata = data[is.na(data$haut_tronc),])
+data$haut_tronc[is.na(data$haut_tronc)] <- predict(model3, newdata = data[is.na(data$haut_tronc),]) # nolint
 
 print("------------Vérification de si on a des NA dans les dimensions après modification-----------") # nolint
 print(sum(is.na(data$haut_tronc)))
@@ -493,7 +553,7 @@ print("------------------------------bilan : 0 valeurs NA-----------------------
 
 # nettoyage colonne remarquable
 
-data$nomfrancais <- as.factor(data$nomfrancais) 
+data$nomfrancais <- as.factor(data$nomfrancais)
 
 
 remarquable <- function(data){
@@ -510,9 +570,9 @@ remarquable <- function(data){
     print(table(data$remarquable))
     #data$remarquable[is.na(data$remarquable)] <- FALSE #on va faire une regression à la place
 
-    data_temp=data[!is.na(data$remarquable) & !is.na(data$fk_stadedev) & !is.na(data$haut_tot) & !is.na(data$haut_tronc) & !is.na(data$tronc_diam) & !is.na(data$nomfrancais),]
+    data_temp=data[!is.na(data$remarquable) & !is.na(data$fk_stadedev) & !is.na(data$haut_tot) & !is.na(data$haut_tronc) & !is.na(data$tronc_diam),]
     #View(data_temp)
-    model_remarquable <- glm(remarquable ~ nomfrancais + fk_stadedev + haut_tot + haut_tronc + tronc_diam, data = data_temp, family = "binomial")
+    model_remarquable <- glm(remarquable ~  fk_stadedev + haut_tot + haut_tronc + tronc_diam, data = data_temp, family = "binomial")
     data$remarquable[is.na(data$remarquable)] <- predict(model_remarquable, newdata = data[is.na(data$remarquable),], type = "response") > 0.5
     print(sum(is.na(data$remarquable)))
     print(table(data$remarquable))
@@ -731,16 +791,115 @@ for (col in colonnes) {
 #  |_|   |_|  \___|\__,_|_|\___|\__|_|\___/|_| |_| /_/    |_| \_\___|\__, |_|  \___||___/___/_|\___/|_| |_|     #nolint
 #                                                                    |___/                                      #nolint
 
-#affiche les lignes où age_estim est NA
-#print(data[is.na(data$age_estim), c("fk_stadedev", "tronc_diam", "haut_tronc", "haut_tot")])
-print(sum(is.na(data$age_estim)))
-data_temp = data[!is.na(data$haut_tot) & !is.na(data$haut_tronc) & !is.na(data$tronc_diam) & !is.na(data$age_estim),]
-model_age = lm(age_estim ~ haut_tot + tronc_diam + haut_tronc , data = data_temp)
-data$age_estim[is.na(data$age_estim)] <- predict(model_age, newdata = data[is.na(data$age_estim),])
-print("age estim")
-print(sum(is.na(data$age_estim)))
-print(sum(is.na(data$clc_nbr_diag)))
-View(data)
+print("--------Etude de regression sur age_etim-----------")
 
-#Affichage des données
-View(data)
+model1 <- lm(age_estim ~ tronc_diam, data = data)
+
+# Résumé du modèle
+print("Model 1 : Régression linéaire simple avec tronc_diam")
+print(summary(model1))
+
+# Modèle 2 : Régression linéaire simple avec haut_tot
+model2 <- lm(age_estim ~ haut_tot, data = data)
+
+# Résumé du modèle
+print("Model 2 : Régression linéaire simple avec haut_tot")
+print(summary(model2))
+
+# Modèle 3 : Régression linéaire multiple avec tronc_diam et haut_tot
+model3 <- lm(age_estim ~ tronc_diam + haut_tot, data = data)
+
+# Résumé du modèle
+print("Model 3 : Régression linéaire simple avec tronc_diam et haut_tot")
+print(summary(model3))
+
+# Modèle 4 : Régression linéaire multiple avec toutes les variables
+print("Model 4 : Régression linéaire simple avec haut_tot, tronc_diam et haut_tot")
+model4 <- lm(age_estim ~ tronc_diam + haut_tot + haut_tronc, data = data)
+
+# Résumé du modèle
+print(summary(model4))
+
+# Modèle 5 : Régression linéaire multiple avec toutes les variables
+print("Model 5 : Régression linéaire simple avec haut_tot, tronc_diam, haut_tronc et clc_nbr_diag")
+model5 <- lm(age_estim ~ tronc_diam + haut_tot + haut_tronc + clc_nbr_diag, data = data)
+
+# Résumé du modèle
+print(summary(model5))
+
+# Modèle 6 : Régression linéaire multiple avec toutes les variables
+print("Model 6 : Régression linéaire simple avec tronc_diam, haut_tronc et clc_nbr_diag (sans haut_tot car on voit avant qu'il n'est pas significatif)")
+model6 <- lm(age_estim ~ tronc_diam  + haut_tronc + clc_nbr_diag, data = data)
+# Résumé du modèle
+print(summary(model6))
+
+print("Meilleur model : Modele 6 car il a le meilleur R² et les variables sont toutes significatives")
+# nettoyage colonne remarquable
+print("Nombre de NA avant regression :")
+print(sum(is.na(data$age_estim)))
+data$age_estim[is.na(data$age_estim)] <- predict(model6, newdata = data[is.na(data$age_estim),])
+print("Nombre de NA après regression :")
+print(sum(is.na(data$age_estim)))
+
+print("--------Etude de regression sur l'harmonisation des quartiers-----------")
+
+data$clc_quartier <- as.factor(data$clc_quartier)
+
+# Calcul du nombre d'arbres par quartier
+tree_count <- data %>% group_by(clc_quartier) %>% summarise(num_arbres = n())
+print(tree_count)
+
+
+#Y liste de 1 ou 0 si le quartier est harmonisé ou non (nombre d'arbre supérieur à la moyenne )
+harmonisation <- ifelse(tree_count$num_arbres < mean(tree_count$num_arbres), 1, 0)
+print(harmonisation)
+
+model_plant <- glm(harmonisation ~ num_arbres, data = tree_count)
+
+summary(model_plant)
+
+courbe_regression = ggplot(data = tree_count, aes(x = num_arbres, y = harmonisation)) +
+    geom_point() +
+    geom_smooth(method = "glm", method.args = list(family = "binomial")) +
+    labs(title = "Régression logistique de l'harmonisation des quartiers",
+        x = "Nombre d'arbres",
+        y = "Harmonisation") +
+    theme_minimal()
+
+print(courbe_regression)
+
+
+
+print("--------Etude de regression sur l'abattage des arbres-----------")
+
+# Calcul du nombre d'arbres abattus
+abattage <- ifelse(data$fk_arb_etat != "en place", 1, 0)
+
+model_abattage <- glm(abattage ~ haut_tot + tronc_diam + fk_stadedev , data = data, family = "binomial")
+
+#fait la liste des arbres à abattre en focntion du modele d'abattage
+data$abattage <- predict(model_abattage, newdata = data, type = "response") > 0.5
+
+summary(model_abattage)
+
+print(sum(is.na(data$abattage)))
+
+model_abattage <- glm(abattage ~ haut_tot + tronc_diam , data = data, family = "binomial")
+#refait la regression lineaire pour les NA de data$abattage (car pas de fk_stadedev)
+data$abattage[is.na(data$abattage)] <- predict(model_abattage, newdata = data[is.na(data$abattage),], type = "response") > 0.5
+
+#affiche les lignes (juste haut_tot tronc_diam fk_stadedev et remarquable) qui devraient être abattues sans prendre ceux où remarquable = TRUE
+print(data[data$abattage == TRUE & data$remarquable == FALSE, c("haut_tot", "tronc_diam", "fk_stadedev", "remarquable")])
+
+
+
+#                              _        _   _               #nolint
+#    _____  ___ __   ___  _ __| |_ __ _| |_(_) ___  _ __    #nolint
+#   / _ \ \/ / '_ \ / _ \| '__| __/ _` | __| |/ _ \| '_ \   #nolint
+#  |  __/>  <| |_) | (_) | |  | || (_| | |_| | (_) | | | |  #nolint
+#   \___/_/\_\ .__/ \___/|_|   \__\__,_|\__|_|\___/|_| |_|  #nolint
+#            |_|                                            #nolint
+
+
+# Sauvegarde des données nettoyées
+write.csv(data, "data_cleaned.csv", row.names = FALSE)
